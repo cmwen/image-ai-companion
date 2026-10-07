@@ -1,0 +1,91 @@
+name: macOS testing release
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing version tag to release (for example v0.1.0)"
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: release-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+jobs:
+  release:
+    runs-on: macos-14
+    timeout-minutes: 60
+    permissions:
+      contents: write
+    env:
+      RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+    steps:
+      - name: Check out version tag
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ inputs.tag || github.ref_name }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Set up Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "24"
+          cache: npm
+      - name: Verify tag and synchronized versions
+        run: |
+          set -euo pipefail
+          node scripts/check-release-version.mjs
+          test "$(git rev-parse HEAD)" = "$(git rev-parse "refs/tags/$RELEASE_TAG^{commit}")"
+      - name: Install Rust with both macOS targets
+        run: |
+          rustup toolchain install 1.93.0 --profile minimal --component rustfmt
+          rustup default 1.93.0
+          rustup target add aarch64-apple-darwin x86_64-apple-darwin
+      - name: Validate frontend and native code
+        run: |
+          npm ci
+          npm test
+          npm run build
+          cargo fmt --manifest-path src-tauri/Cargo.toml -- --check
+          cargo test --locked --manifest-path src-tauri/Cargo.toml
+      - name: Build universal application and DMG with ad-hoc signing
+        run: npm run tauri -- build --ci --target universal-apple-darwin --bundles app,dmg
+      - name: Verify signatures, architectures, and package checksums
+        run: bash scripts/package-macos-release.sh
+      - name: Publish complete validated release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          # Existing releases are never replaced automatically.
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            echo "Release already exists; refusing to replace its assets."
+            exit 1
+          fi
+          draft_created=false
+          cleanup() {
+            if [[ "$draft_created" == true ]]; then
+              gh release delete "$RELEASE_TAG" --yes || true
+            fi
+          }
+          trap cleanup EXIT
+          cat > release-notes.md <<'NOTES'
+          Testing build for macOS (Apple Silicon and Intel).
+
+          Download the universal DMG or the application tar.gz, and verify it against SHA256SUMS. This app is ad-hoc signed, not Developer ID signed or notarized. No certificate installation is needed. macOS may require System Settings → Privacy & Security → Open Anyway after the first launch attempt. See the README for scoped installation instructions.
+
+          This milestone uses offline guidance and does not generate images.
+          NOTES
+          # Keep all uploads private as a draft until every expected asset is present.
+          draft_created=true
+          gh release create "$RELEASE_TAG" --verify-tag --draft --title "Image AI Companion $RELEASE_TAG" --notes-file release-notes.md release-assets/*
+          test "$(gh release view "$RELEASE_TAG" --json assets --jq '.assets | length')" = 3
+          gh release view "$RELEASE_TAG" --json assets --jq '.assets[] | select(.size <= 0) | .name' > empty-assets.txt
+          test ! -s empty-assets.txt
+          prerelease=false
+          if [[ "$RELEASE_TAG" == v0.1.0 || "$RELEASE_TAG" == *-* ]]; then prerelease=true; fi
+          gh release edit "$RELEASE_TAG" --draft=false --prerelease="$prerelease" --latest=false
+          draft_created=false
