@@ -1,0 +1,197 @@
+{
+  "concepts": [
+    {
+      "id": "watercolour",
+      "title": "Watercolour",
+      "category": "style",
+      "shortDescription": "Soft washes and visible paper texture.",
+      "whyItMatters": "Soft edges create a gentle, handmade feeling.",
+      "whenToUse": ["portraits"],
+      "promptExamples": ["watercolour illustration with soft washes"],
+      "relatedConceptIds": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "negative-space",
+      "title": "Negative space",
+      "category": "composition",
+      "shortDescription": "Leave breathing room around the main subject.",
+      "whyItMatters": "An uncluttered area guides attention and leaves room for text.",
+      "whenToUse": ["posters"],
+      "promptExamples": ["generous negative space around the subject"],
+      "relatedConceptIds": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "rule-thirds",
+      "title": "Rule of thirds",
+      "category": "composition",
+      "shortDescription": "Place the subject away from the centre.",
+      "whyItMatters": "An off-centre focal point can give the scene movement.",
+      "whenToUse": ["landscapes"],
+      "promptExamples": ["subject positioned on the left third"],
+      "relatedConceptIds": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "low-angle",
+      "title": "Low angle",
+      "category": "camera",
+      "shortDescription": "Look up at the subject from below.",
+      "whyItMatters": "The subject can feel larger or more powerful.",
+      "whenToUse": ["characters"],
+      "promptExamples": ["low-angle medium shot"],
+      "relatedConceptIds": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "wide-shot",
+      "title": "Wide shot",
+      "category": "camera",
+      "shortDescription": "Show the subject within a wider environment.",
+      "whyItMatters": "The setting and scale become part of the story.",
+      "whenToUse": ["environments"],
+      "promptExamples": ["wide shot showing the surrounding environment"],
+      "relatedConceptIds": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "soft-light",
+      "title": "Soft light",
+      "category": "lighting",
+      "shortDescription": "Use broad, gentle light with soft shadows.",
+      "whyItMatters": "Gentle transitions reveal shape without harsh contrast.",
+      "whenToUse": ["portraits"],
+      "promptExamples": ["soft side lighting with gentle shadows"],
+      "relatedConceptIds": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "rim-light",
+      "title": "Rim light",
+      "category": "lighting",
+      "shortDescription": "Light the edge of the subject from behind.",
+      "whyItMatters": "A lit edge helps separate the subject from its background.",
+      "whenToUse": ["dark backgrounds"],
+      "promptExamples": ["subtle warm rim light along the silhouette"],
+      "relatedConceptIds": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "limited-palette",
+      "title": "Limited palette",
+      "category": "colour",
+      "shortDescription": "Choose a small family of colours.",
+      "whyItMatters": "A few colours make the image feel cohesive.",
+      "whenToUse": ["illustrations"],
+      "promptExamples": ["limited palette of warm orange and cool blue"],
+      "relatedConceptIds": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "muted-colour",
+      "title": "Muted colour",
+      "category": "colour",
+      "shortDescription": "Use colours with lower saturation.",
+      "whyItMatters": "Quiet colours can support a calm or nostalgic mood.",
+      "whenToUse": ["quiet scenes"],
+      "promptExamples": ["muted warm colour palette"],
+      "relatedConceptIds": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "shape-language",
+      "title": "Shape language",
+      "category": "art-direction",
+      "shortDescription": "Use rounded or angular shapes deliberately.",
+      "whyItMatters": "Rounded shapes often feel approachable; angular ones can feel tense.",
+      "whenToUse": ["character design"],
+      "promptExamples": ["rounded shapes and a clear friendly silhouette"],
+      "relatedConceptIds": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "cinematic",
+      "title": "Cinematic illustration",
+      "category": "style",
+      "shortDescription": "Frame a scene as a moment in a story.",
+      "whyItMatters": "Lighting and framing help create narrative atmosphere.",
+      "whenToUse": ["story scenes"],
+      "promptExamples": ["cinematic illustration"],
+      "relatedConceptIds": [],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "texture",
+      "title": "Material texture",
+      "category": "art-direction",
+      "shortDescription": "Describe how a surface feels.",
+      "whyItMatters": "Surface detail can make objects feel tactile and distinct.",
+      "whenToUse": ["product studies"],
+      "promptExamples": ["matte ceramic surfaces with subtle texture"],
+      "relatedConceptIds": [],
+      "difficulty": "beginner"
+    }
+  ],
+  "recipes": [
+    {
+      "id": "robot",
+      "title": "A character with a story",
+      "summary": "Connect a character, a place, and one lighting choice.",
+      "intent": {
+        "subject": "a small friendly robot",
+        "environment": "a futuristic train station",
+        "conceptIds": ["cinematic", "soft-light", "limited-palette"],
+        "mood": "quiet and hopeful",
+        "constraints": "",
+        "destinationId": "chatgpt"
+      }
+    },
+    {
+      "id": "poster",
+      "title": "Room for a message",
+      "summary": "Make a poster illustration with space for your own typography.",
+      "intent": {
+        "subject": "a single wildflower",
+        "environment": "a simple cream background",
+        "conceptIds": ["watercolour", "negative-space", "muted-colour"],
+        "mood": "gentle",
+        "constraints": "Leave the upper half empty; no lettering.",
+        "destinationId": "chatgpt"
+      }
+    },
+    {
+      "id": "product",
+      "title": "A tactile object",
+      "summary": "Explore how light describes a simple material.",
+      "intent": {
+        "subject": "a handmade ceramic cup",
+        "environment": "a simple studio table",
+        "conceptIds": ["soft-light", "texture", "limited-palette"],
+        "mood": "calm",
+        "constraints": "",
+        "destinationId": "chatgpt"
+      }
+    }
+  ],
+  "exercises": [
+    {
+      "id": "light",
+      "title": "Change only the light",
+      "summary": "Compare a gentle scene with a stronger silhouette.",
+      "objective": "Create two versions of the same prompt. Keep the subject and framing fixed; replace soft light with rim light. Which separates the subject more clearly?",
+      "starterPrompt": "A small robot standing in a dark train station.",
+      "conceptIds": ["soft-light", "rim-light"],
+      "difficulty": "beginner"
+    },
+    {
+      "id": "scale",
+      "title": "Let the setting tell the story",
+      "summary": "Explore how framing changes a scene.",
+      "objective": "Compare a low-angle medium shot with a wide shot. Keep everything else fixed. Notice which gives the environment more importance.",
+      "starterPrompt": "A tiny explorer beside an enormous ceramic cup.",
+      "conceptIds": ["low-angle", "wide-shot"],
+      "difficulty": "beginner"
+    }
+  ]
+}
