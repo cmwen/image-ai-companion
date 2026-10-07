@@ -15,9 +15,7 @@ export interface CreativeDestination {
 }
 export function createDestination(id: DestinationId): CreativeDestination {
   const url =
-    id === "chatgpt"
-      ? "https://chatgpt.com/"
-      : "https://labs.google/fx/tools/flow";
+    id === "chatgpt" ? "https://chatgpt.com/" : "https://flow.google.com/";
   return {
     id,
     name: id === "chatgpt" ? "ChatGPT" : "Google Flow",

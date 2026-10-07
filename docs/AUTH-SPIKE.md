@@ -18,9 +18,26 @@ These observations can establish that the native child view was created and that
 
 The release workflow runs the actual native smoke on macOS and publishes its sanitized AUTH-SMOKE.json report alongside the installers. The report explicitly sets login_verified to false. Its reported outcomes must be reviewed separately from the mandatory native build, tests, signatures, and packaging checks. Authentication availability is inconclusive until an interactive test is completed.
 
+## macOS CI observations from 0.1.2
+
+The published 0.1.2 native build and anonymous smoke created all four child WebViews. Three cases emitted a document-load completion. The release's AUTH-SMOKE.json recorded:
+
+| Anonymous case        | Finished document loads | Blocked navigations | Timeout |
+| --------------------- | ----------------------: | ------------------: | ------- |
+| ChatGPT destination   |                       1 |                   0 | No      |
+| Flow destination      |                       0 |                   1 | Yes     |
+| ChatGPT sign-in entry |                       1 |                   1 | No      |
+| Google sign-in entry  |                       1 |                   1 | No      |
+
+These are document-load observations, not proof of authentication. No credentials were submitted. Sign-in, MFA, popup completion, restart persistence, and image generation remain unverified.
+
+A separate public-page check found the legacy Flow entry at `labs.google/fx/tools/flow` redirects to Google's canonical [Flow site](https://flow.google.com/). The 0.1.2 policy did not allow that destination host. Version 0.1.3 therefore opens `https://flow.google.com/` directly and allows that exact hostname, retaining the legacy entry and Google account host for navigation. This addresses the identified Flow redirect; further provider restrictions may still occur. Version 0.1.3 also permits exact `about:blank` navigation for WebView subframe/popup bootstrap, retaining strict HTTPS destination checks for page-load completion. Other about documents, data URLs, and JavaScript URLs remain denied; blank bootstrap never counts as a loaded destination.
+
+The 0.1.3 anonymous smoke additionally records blocked hostname and scheme sets, without URL paths, query strings, fragments, usernames, or passwords, so remaining navigation restrictions can be diagnosed. Blocked navigation in the two sign-in cases was not identified by the older report and remains inconclusive until the new report is reviewed. The normal workspace continues to redact unapproved hosts from status events.
+
 ## Interactive macOS checklist
 
-Use the 0.1.2 universal testing release on a real Mac. Enter credentials only into the destination’s own native page; never provide them to the companion.
+Use the 0.1.3 universal testing release on a real Mac. Enter credentials only into the destination’s own native page; never provide them to the companion.
 
 | Check                                                          | ChatGPT                                  | Google Flow                              |
 | -------------------------------------------------------------- | ---------------------------------------- | ---------------------------------------- |

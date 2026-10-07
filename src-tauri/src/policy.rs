@@ -26,8 +26,13 @@ impl Destination {
     pub fn url(self) -> &'static str {
         match self {
             Self::Chatgpt => "https://chatgpt.com/",
-            Self::Flow => "https://labs.google/fx/tools/flow",
+            Self::Flow => "https://flow.google.com/",
         }
+    }
+    /// WKWebView calls navigation policy for subframe bootstrap requests too.
+    /// Permit only the exact empty about:blank document in addition to HTTPS hosts.
+    pub fn allows_navigation(self, url: &Url) -> bool {
+        url.as_str() == "about:blank" || self.allows(url)
     }
     pub fn allows(self, url: &Url) -> bool {
         url.scheme() == "https"
@@ -48,7 +53,10 @@ impl Destination {
                     | "login.microsoftonline.com"
                     | "appleid.apple.com"
             ),
-            Self::Flow => matches!(host, "labs.google" | "accounts.google.com"),
+            Self::Flow => matches!(
+                host,
+                "flow.google.com" | "labs.google" | "accounts.google.com"
+            ),
         }
     }
 }
@@ -130,6 +138,44 @@ mod tests {
         }
         assert!(Destination::parse("arbitrary-url").is_err());
         assert!(!Destination::Flow.allows(&Url::parse("https://chatgpt.com").unwrap()));
+    }
+    #[test]
+    fn flow_canonical_and_legacy_redirect_hosts_are_allowed_without_subdomain_wildcards() {
+        assert_eq!(Destination::Flow.url(), "https://flow.google.com/");
+        for url in [
+            "https://flow.google.com/",
+            "https://flow.google.com/?redirect=ignored",
+            "https://labs.google/fx/tools/flow",
+            "https://accounts.google.com/ServiceLogin",
+        ] {
+            assert!(Destination::Flow.allows(&Url::parse(url).unwrap()));
+        }
+        for url in [
+            "https://flow.google.com.evil.example/",
+            "https://evil.flow.google.com/",
+            "https://flow.google.com@evil.example/",
+            "http://flow.google.com/",
+            "https://flow.google.com:8443/",
+        ] {
+            assert!(!Destination::Flow.allows(&Url::parse(url).unwrap()));
+        }
+    }
+    #[test]
+    fn blank_bootstrap_is_allowed_for_navigation_but_never_a_destination_load() {
+        for destination in [Destination::Flow, Destination::Chatgpt] {
+            let blank = Url::parse("about:blank").unwrap();
+            assert!(destination.allows_navigation(&blank));
+            assert!(!destination.allows(&blank));
+            for raw in [
+                "about:srcdoc",
+                "about:blank?private=ignored",
+                "about:blank#fragment",
+                "data:text/html,hello",
+                "javascript:alert(1)",
+            ] {
+                assert!(!destination.allows_navigation(&Url::parse(raw).unwrap()));
+            }
+        }
     }
     #[test]
     fn bounds_reject_invalid_and_covering_coordinates() {

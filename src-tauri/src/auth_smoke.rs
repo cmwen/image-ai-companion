@@ -21,6 +21,8 @@ struct Case {
     load_started_count: usize,
     load_finished_count: usize,
     hosts: BTreeSet<String>,
+    blocked_hosts: BTreeSet<String>,
+    blocked_schemes: BTreeSet<String>,
     timed_out: bool,
 }
 const CASES: [(&str, Destination, &str); 4] = [
@@ -32,7 +34,7 @@ const CASES: [(&str, Destination, &str); 4] = [
     (
         "flow-destination",
         Destination::Flow,
-        "https://labs.google/fx/tools/flow",
+        "https://flow.google.com/",
     ),
     (
         "chatgpt-sign-in",
@@ -69,7 +71,7 @@ pub fn start(app: &AppHandle) -> tauri::Result<()> {
         // Normal destination views deliberately retain their persistent stores.
         .incognito(true)
         .on_navigation(move |url| {
-            let allowed = destination.allows(url);
+            let allowed = destination.allows_navigation(url);
             if let Ok(mut cases) = navigation.lock() {
                 if allowed {
                     cases[index].navigation_count += 1;
@@ -78,6 +80,11 @@ pub fn start(app: &AppHandle) -> tauri::Result<()> {
                     }
                 } else {
                     cases[index].blocked_navigation_count += 1;
+                    cases[index].blocked_schemes.insert(url.scheme().to_owned());
+                    if let Some(host) = url.host_str() {
+                        // Anonymous smoke only: host and scheme, never path/query/userinfo.
+                        cases[index].blocked_hosts.insert(host.to_owned());
+                    }
                 }
             }
             allowed

@@ -105,7 +105,7 @@ fn popup_handler(
     destination: Destination,
 ) -> impl Fn(Url, NewWindowFeatures) -> NewWindowResponse<tauri::Wry> + Send + 'static {
     move |url, features| {
-        if !destination.allows(&url) {
+        if !destination.allows_navigation(&url) {
             status(&app, destination, "popup-blocked", &url);
             return NewWindowResponse::Deny;
         }
@@ -139,7 +139,7 @@ fn popup_handler(
         .window_features(features)
         .title("Destination sign-in")
         .on_navigation(move |url| {
-            let allowed = url.as_str() == "about:blank" || destination.allows(url);
+            let allowed = destination.allows_navigation(url);
             if !allowed {
                 status(&navigation_app, destination, "navigation-blocked", url);
             }
@@ -185,7 +185,7 @@ pub async fn embed_destination(
         .incognito(false)
         .data_directory(directory)
         .on_navigation(move |url| {
-            let allowed = destination.allows(url);
+            let allowed = destination.allows_navigation(url);
             if !allowed {
                 status(&navigation_app, destination, "navigation-blocked", url);
             }

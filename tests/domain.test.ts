@@ -84,6 +84,9 @@ describe("content and creation loop", () => {
       });
     }
   });
+  it("uses the current official Flow host for browser handoff", () => {
+    expect(createDestination("flow").url).toBe("https://flow.google.com/");
+  });
   it("persists edited prompt, settings, and project CRUD across repository recreation", async () => {
     const s = storage(),
       r = createPreviewRepository(s);

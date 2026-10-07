@@ -4,12 +4,12 @@ A local-first desktop companion for learning visual language while building prom
 
 ## Download and open on macOS
 
-Open the [GitHub Releases page](https://github.com/cmwen/image-ai-companion/releases) and select the `v0.1.2` testing prerelease (or a later release). Download `Image-AI-Companion_v0.1.2_universal.dmg` and `SHA256SUMS`. The universal app supports Apple Silicon and Intel Macs. An `.app.tar.gz` is also provided if you prefer extracting the application directly.
+Open the [GitHub Releases page](https://github.com/cmwen/image-ai-companion/releases) and select the `v0.1.3` testing prerelease (or a later release). Download `Image-AI-Companion_v0.1.3_universal.dmg` and `SHA256SUMS`. The universal app supports Apple Silicon and Intel Macs. An `.app.tar.gz` is also provided if you prefer extracting the application directly.
 
 In Terminal, change to your download directory and compare the file’s SHA-256 with its entry in `SHA256SUMS`:
 
 ```sh
-shasum -a 256 Image-AI-Companion_v0.1.2_universal.dmg
+shasum -a 256 Image-AI-Companion_v0.1.3_universal.dmg
 ```
 
 Open the DMG, drag **Image AI Companion.app** to Applications, and eject the disk image. For the tar.gz, extract it and move the app to Applications.
@@ -34,9 +34,9 @@ Update the version together in `package.json`, `package-lock.json`, `src-tauri/C
 
 ```sh
 node scripts/check-release-version.mjs
-RELEASE_TAG=v0.1.3 node scripts/check-release-version.mjs # after updating to 0.1.3
-git tag v0.1.3
-git push origin v0.1.3
+RELEASE_TAG=v0.1.4 node scripts/check-release-version.mjs # after updating to 0.1.4
+git tag v0.1.4
+git push origin v0.1.4
 ```
 
 The workflow checks the tag and versions, runs frontend tests/build and native tests, builds a universal app and DMG, verifies ad-hoc signatures and the mounted DMG contents, runs an anonymous native page-load smoke probe, then packages the app, AUTH-SMOKE.json report, and SHA-256 checksums. The report does not verify credential login or MFA. Assets upload to a draft; the release becomes public only after all four assets are present. Existing releases are never replaced automatically. Failed publishing attempts clean up their draft so partial assets do not appear as a public release.

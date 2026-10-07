@@ -24,7 +24,13 @@ def sanitized_report(data):
         hosts = case.get('hosts')
         if not isinstance(hosts, list) or any(not isinstance(host, str) or not re.fullmatch(r'[a-z0-9.-]+', host) for host in hosts):
             raise ValueError('Native report must contain only hostnames')
-        clean.append({'id': case['id'], 'created': case['created'], **counts, 'hosts': hosts, 'timed_out': case['timed_out']})
+        metadata = {}
+        for name, pattern in [('blocked_hosts', r'[a-z0-9.-]+'), ('blocked_schemes', r'[a-z][a-z0-9+.-]*')]:
+            values = case.get(name)
+            if not isinstance(values, list) or any(not isinstance(value, str) or not re.fullmatch(pattern, value) for value in values):
+                raise ValueError('Native blocked navigation metadata must contain only hostnames or schemes')
+            metadata[name] = values
+        clean.append({'id': case['id'], 'created': case['created'], **counts, 'hosts': hosts, **metadata, 'timed_out': case['timed_out']})
     return {'kind': data['kind'], 'schema_version': 1, 'created_count': sum(case['created'] for case in clean), 'loaded_count': sum(case['load_finished_count'] > 0 for case in clean), 'login_verified': False, 'interpretation': 'Anonymous native document-load observations only. Sign-in, MFA, popup completion, and restart session persistence require interactive testing.', 'cases': clean}
 
 def main():
