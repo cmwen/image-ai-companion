@@ -86,6 +86,6 @@ jobs:
           gh release view "$RELEASE_TAG" --json assets --jq '.assets[] | select(.size <= 0) | .name' > empty-assets.txt
           test ! -s empty-assets.txt
           prerelease=false
-          if [[ "$RELEASE_TAG" == v0.1.0 || "$RELEASE_TAG" == *-* ]]; then prerelease=true; fi
+          if [[ "$RELEASE_TAG" == v0.1.* || "$RELEASE_TAG" == *-* ]]; then prerelease=true; fi
           gh release edit "$RELEASE_TAG" --draft=false --prerelease="$prerelease" --latest=false
           draft_created=false

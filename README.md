@@ -4,12 +4,12 @@ A local-first desktop companion for learning visual language while building prom
 
 ## Download and open on macOS
 
-Open the [GitHub Releases page](https://github.com/cmwen/image-ai-companion/releases) and select the `v0.1.0` testing prerelease (or a later release). Download `Image-AI-Companion_v0.1.0_universal.dmg` and `SHA256SUMS`. The universal app supports Apple Silicon and Intel Macs. An `.app.tar.gz` is also provided if you prefer extracting the application directly.
+Open the [GitHub Releases page](https://github.com/cmwen/image-ai-companion/releases) and select the `v0.1.1` testing prerelease (or a later release). Download `Image-AI-Companion_v0.1.1_universal.dmg` and `SHA256SUMS`. The universal app supports Apple Silicon and Intel Macs. An `.app.tar.gz` is also provided if you prefer extracting the application directly.
 
 In Terminal, change to your download directory and compare the file’s SHA-256 with its entry in `SHA256SUMS`:
 
 ```sh
-shasum -a 256 Image-AI-Companion_v0.1.0_universal.dmg
+shasum -a 256 Image-AI-Companion_v0.1.1_universal.dmg
 ```
 
 Open the DMG, drag **Image AI Companion.app** to Applications, and eject the disk image. For the tar.gz, extract it and move the app to Applications.
@@ -28,15 +28,15 @@ Do not disable Gatekeeper globally or override a malware warning. For a damaged 
 
 ## Publishing a new release
 
-The `.github/workflows/release.yml` workflow runs on a pushed `v*` tag or through **Actions → macOS testing release → Run workflow**, with an existing version tag. It requires no Apple signing credentials. `v0.1.0` and tags containing a prerelease suffix are published as prereleases.
+The `.github/workflows/release.yml` workflow runs on a pushed `v*` tag or through **Actions → macOS testing release → Run workflow**, with an existing version tag. It requires no Apple signing credentials. `v0.1.*` testing releases and tags containing a prerelease suffix are published as prereleases.
 
 Update the version together in `package.json`, `package-lock.json`, `src-tauri/Cargo.toml`, `src-tauri/Cargo.lock`, and `src-tauri/tauri.conf.json`; commit the changes, then create and push the matching tag:
 
 ```sh
 node scripts/check-release-version.mjs
-RELEASE_TAG=v0.1.1 node scripts/check-release-version.mjs # after updating to 0.1.1
-git tag v0.1.1
-git push origin v0.1.1
+RELEASE_TAG=v0.1.2 node scripts/check-release-version.mjs # after updating to 0.1.2
+git tag v0.1.2
+git push origin v0.1.2
 ```
 
 The workflow checks the tag and versions, runs frontend tests/build and native tests, builds a universal app and DMG, verifies ad-hoc signatures and the mounted DMG contents, then packages the app and SHA-256 checksums. Assets upload to a draft; the release becomes public only after all three assets are present. Existing releases are never replaced automatically. Failed publishing attempts clean up their draft so partial assets do not appear as a public release.
@@ -51,7 +51,7 @@ npm run dev        # browser preview at http://127.0.0.1:1420
 npm run tauri dev  # native desktop app
 ```
 
-Native development also requires Rust 1.90+ and [Tauri platform prerequisites](https://v2.tauri.app/start/prerequisites/). On Linux, install GTK3 and WebKitGTK 4.1 development packages. macOS is the primary packaging target; platform packaging has not been verified yet.
+Native development also requires Rust 1.90+ and [Tauri platform prerequisites](https://v2.tauri.app/start/prerequisites/). On Linux, install GTK3 and WebKitGTK 4.1 development packages. macOS is the primary packaging target; the release workflow verifies packaging and signatures, while GUI launch still needs a manual smoke test on your Mac.
 
 ## Use
 

@@ -9,7 +9,7 @@ codesign --verify --deep --strict --verbose=2 "$app_path"
 signature_details="$(codesign --display --verbose=4 "$app_path" 2>&1)"
 printf '%s\n' "$signature_details"
 printf '%s\n' "$signature_details" | grep -Fx 'Signature=adhoc'
-lipo -verify_arch arm64 x86_64 "$app_path/Contents/MacOS/image-ai-companion"
+lipo "$app_path/Contents/MacOS/image-ai-companion" -verify_arch arm64 x86_64
 shopt -s nullglob
 dmgs=("$bundle_dir"/dmg/*.dmg)
 [[ ${#dmgs[@]} -eq 1 ]]
@@ -21,7 +21,7 @@ trap cleanup EXIT
 hdiutil attach "${dmgs[0]}" -mountpoint "$mount_path" -nobrowse -readonly -quiet
 codesign --verify --deep --strict --verbose=2 "$mount_path/Image AI Companion.app"
 codesign --display --verbose=4 "$mount_path/Image AI Companion.app" 2>&1 | grep -Fx 'Signature=adhoc'
-lipo -verify_arch arm64 x86_64 "$mount_path/Image AI Companion.app/Contents/MacOS/image-ai-companion"
+lipo "$mount_path/Image AI Companion.app/Contents/MacOS/image-ai-companion" -verify_arch arm64 x86_64
 mkdir -p release-assets
 cp "${dmgs[0]}" "release-assets/Image-AI-Companion_${RELEASE_TAG}_universal.dmg"
 tar -czf "release-assets/Image-AI-Companion_${RELEASE_TAG}_universal.app.tar.gz" -C "$bundle_dir/macos" 'Image AI Companion.app'
