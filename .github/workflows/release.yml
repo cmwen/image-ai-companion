@@ -47,6 +47,7 @@ jobs:
         run: |
           npm ci
           npm test
+          python3 -m unittest discover -s tests -p 'test_*.py'
           npm run build
           cargo fmt --manifest-path src-tauri/Cargo.toml -- --check
           cargo test --locked --manifest-path src-tauri/Cargo.toml
@@ -54,6 +55,10 @@ jobs:
         run: npm run tauri -- build --ci --target universal-apple-darwin --bundles app,dmg
       - name: Verify signatures, architectures, and package checksums
         run: bash scripts/package-macos-release.sh
+      - name: Probe anonymous native destination and sign-in pages
+        run: |
+          python3 scripts/run-auth-smoke.py "src-tauri/target/universal-apple-darwin/release/bundle/macos/Image AI Companion.app/Contents/MacOS/image-ai-companion" release-assets/AUTH-SMOKE.json
+          (cd release-assets && shasum -a 256 ./*.dmg ./*.tar.gz ./*.json > SHA256SUMS && shasum -a 256 -c SHA256SUMS)
       - name: Publish complete validated release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -77,12 +82,14 @@ jobs:
 
           Download the universal DMG or the application tar.gz, and verify it against SHA256SUMS. This app is ad-hoc signed, not Developer ID signed or notarized. No certificate installation is needed. macOS may require System Settings → Privacy & Security → Open Anyway after the first launch attempt. See the README for scoped installation instructions.
 
+          This build adds an experimental native destination pane beside the companion. AUTH-SMOKE.json records anonymous document-load observations from the actual macOS WebView; it does not verify sign-in, MFA, popup completion, or session persistence. See docs/AUTH-SPIKE.md for the interactive test checklist.
+
           This milestone uses offline guidance and does not generate images.
           NOTES
           # Keep all uploads private as a draft until every expected asset is present.
           draft_created=true
           gh release create "$RELEASE_TAG" --verify-tag --draft --title "Image AI Companion $RELEASE_TAG" --notes-file release-notes.md release-assets/*
-          test "$(gh release view "$RELEASE_TAG" --json assets --jq '.assets | length')" = 3
+          test "$(gh release view "$RELEASE_TAG" --json assets --jq '.assets | length')" = 4
           gh release view "$RELEASE_TAG" --json assets --jq '.assets[] | select(.size <= 0) | .name' > empty-assets.txt
           test ! -s empty-assets.txt
           prerelease=false

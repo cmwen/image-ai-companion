@@ -4,12 +4,12 @@ A local-first desktop companion for learning visual language while building prom
 
 ## Download and open on macOS
 
-Open the [GitHub Releases page](https://github.com/cmwen/image-ai-companion/releases) and select the `v0.1.1` testing prerelease (or a later release). Download `Image-AI-Companion_v0.1.1_universal.dmg` and `SHA256SUMS`. The universal app supports Apple Silicon and Intel Macs. An `.app.tar.gz` is also provided if you prefer extracting the application directly.
+Open the [GitHub Releases page](https://github.com/cmwen/image-ai-companion/releases) and select the `v0.1.2` testing prerelease (or a later release). Download `Image-AI-Companion_v0.1.2_universal.dmg` and `SHA256SUMS`. The universal app supports Apple Silicon and Intel Macs. An `.app.tar.gz` is also provided if you prefer extracting the application directly.
 
 In Terminal, change to your download directory and compare the file’s SHA-256 with its entry in `SHA256SUMS`:
 
 ```sh
-shasum -a 256 Image-AI-Companion_v0.1.1_universal.dmg
+shasum -a 256 Image-AI-Companion_v0.1.2_universal.dmg
 ```
 
 Open the DMG, drag **Image AI Companion.app** to Applications, and eject the disk image. For the tar.gz, extract it and move the app to Applications.
@@ -34,12 +34,12 @@ Update the version together in `package.json`, `package-lock.json`, `src-tauri/C
 
 ```sh
 node scripts/check-release-version.mjs
-RELEASE_TAG=v0.1.2 node scripts/check-release-version.mjs # after updating to 0.1.2
-git tag v0.1.2
-git push origin v0.1.2
+RELEASE_TAG=v0.1.3 node scripts/check-release-version.mjs # after updating to 0.1.3
+git tag v0.1.3
+git push origin v0.1.3
 ```
 
-The workflow checks the tag and versions, runs frontend tests/build and native tests, builds a universal app and DMG, verifies ad-hoc signatures and the mounted DMG contents, then packages the app and SHA-256 checksums. Assets upload to a draft; the release becomes public only after all three assets are present. Existing releases are never replaced automatically. Failed publishing attempts clean up their draft so partial assets do not appear as a public release.
+The workflow checks the tag and versions, runs frontend tests/build and native tests, builds a universal app and DMG, verifies ad-hoc signatures and the mounted DMG contents, runs an anonymous native page-load smoke probe, then packages the app, AUTH-SMOKE.json report, and SHA-256 checksums. The report does not verify credential login or MFA. Assets upload to a draft; the release becomes public only after all four assets are present. Existing releases are never replaced automatically. Failed publishing attempts clean up their draft so partial assets do not appear as a public release.
 
 ## Run
 
@@ -53,11 +53,17 @@ npm run tauri dev  # native desktop app
 
 Native development also requires Rust 1.90+ and [Tauri platform prerequisites](https://v2.tauri.app/start/prerequisites/). On Linux, install GTK3 and WebKitGTK 4.1 development packages. macOS is the primary packaging target; the release workflow verifies packaging and signatures, while GUI launch still needs a manual smoke test on your Mac.
 
+## Embedded creative workspace (experimental)
+
+The native desktop app now offers **Embed (experimental)** in Create. ChatGPT or Google Flow appears in the same window beside the companion. Build your prompt, use **Copy & focus destination**, and paste it on the right. Reload and close controls manage the workspace. Destination navigation, login, and related authentication popups remain owned by the provider; no credentials are handled by the companion.
+
+Embedded sessions are separate from your system browser. If a provider refuses embedded sign-in, choose **Open in browser** and sign in there separately. Google can reject embedded OAuth. Complete sign-in, MFA, and session restart behavior have not been interactively verified. See [the authentication spike and test checklist](docs/AUTH-SPIKE.md) for exact observations and remaining tests. The browser development preview supports only the browser handoff.
+
 ## Use
 
 Create a project in Projects, enter a subject in Create, choose a few suggested visual concepts, and build a prompt. Read the explanations, edit or simplify the wording, then copy it and open ChatGPT or Google Flow. Paste it in the destination to generate your image. Save prompt versions to your project and restore them from history.
 
-Explore provides a searchable starter vocabulary. Learn offers two controlled comparison exercises. Settings persists your default destination. Desktop data uses SQLite in the application config directory; browser preview data uses localStorage on the current origin. They are separate stores.
+Explore provides a searchable starter vocabulary. Learn offers two controlled comparison exercises. Settings persists your default destination. Use Create’s destination controls to choose an experimental embedded workspace or external browser handoff. Desktop data uses SQLite in the application config directory; browser preview data uses localStorage on the current origin. They are separate stores.
 
 ## Validate
 
@@ -74,4 +80,4 @@ cargo check --manifest-path src-tauri/Cargo.toml
 
 `src/types` contains serializable domain models. `content/library.json` is validated by Zod, including unique IDs and concept references. Prompt transformations and destination adapters live under `src/features`. React talks only to the repository interface; native SQL migrations are registered in Rust. Destinations use explicit clipboard and system-browser capabilities with a restricted URL allowlist.
 
-The tutor interface and separate `prompts/visual-tutor-system.md` define the future model boundary. The included offline helper offers deterministic guidance; no model endpoint, API key, network tutor request, image critique, embedding, result import, or destination DOM automation is implemented. See [implementation notes](docs/IMPLEMENTATION.md) for boundaries and remaining spikes.
+The tutor interface and separate `prompts/visual-tutor-system.md` define the future model boundary. The included offline helper offers deterministic guidance; no model endpoint, API key, network tutor request, image critique, result import, or destination DOM automation is implemented. See [implementation notes](docs/IMPLEMENTATION.md) for boundaries and remaining spikes.

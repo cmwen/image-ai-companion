@@ -1,4 +1,7 @@
 import { useEffect, useState } from "react";
+import { isTauri } from "@tauri-apps/api/core";
+import { nativeEmbeddedBridge } from "../features/destinations/embedded";
+import DestinationWorkspace from "../features/destinations/DestinationWorkspace";
 import { concepts, recipes, exercises } from "../lib/content";
 import {
   buildPrompt,
@@ -36,6 +39,8 @@ export default function App() {
     [description, setDescription] = useState(""),
     [search, setSearch] = useState(""),
     [rename, setRename] = useState("");
+  const [embedded, setEmbedded] = useState(false);
+  const native = isTauri();
   const selectedProject = projects.find((p) => p.id === projectId);
   const report = async (action: () => Promise<void>) => {
     setError("");
@@ -181,6 +186,19 @@ export default function App() {
             Workspace <span>/</span> {tab}
           </div>
           <div className="destination">
+            <button
+              className="small"
+              aria-pressed={embedded}
+              disabled={!native}
+              title={
+                native
+                  ? "Show destination beside your prompt"
+                  : "Embedding is available in the native desktop app"
+              }
+              onClick={() => setEmbedded((value) => !value)}
+            >
+              {embedded ? "Hide workspace" : "Embed (experimental)"}
+            </button>
             <label htmlFor="destination">Create with</label>
             <select
               id="destination"
@@ -205,7 +223,11 @@ export default function App() {
             </button>
           </div>
         </header>
-        <div className="content">
+        <div
+          className={
+            embedded && tab === "Create" ? "content embedded-layout" : "content"
+          }
+        >
           <div className="page-title">
             <p className="eyebrow">LEARN BY MAKING</p>
             <h1>
@@ -375,13 +397,21 @@ export default function App() {
                           await createDestination(
                             intent.destinationId,
                           ).copyPrompt(prompt);
+                          if (embedded && native)
+                            await (
+                              await nativeEmbeddedBridge()
+                            ).focus(intent.destinationId);
                           setNotice(
-                            "Prompt copied. Open your destination and paste it to create an image.",
+                            embedded && native
+                              ? "Prompt copied. Paste it into the destination beside your companion."
+                              : "Prompt copied. Open your destination and paste it to create an image.",
                           );
                         })
                       }
                     >
-                      Copy prompt
+                      {embedded && native
+                        ? "Copy & focus destination"
+                        : "Copy prompt"}
                     </button>
                     <button disabled={!prompt} onClick={() => build(true)}>
                       Simplify
@@ -747,6 +777,14 @@ export default function App() {
             <span>Local first · Starter library</span>
           </footer>
         </div>
+        {native && (
+          <DestinationWorkspace
+            id={intent.destinationId}
+            enabled={embedded}
+            active={tab === "Create"}
+            onClose={() => setEmbedded(false)}
+          />
+        )}
       </main>
     </div>
   );

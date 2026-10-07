@@ -25,7 +25,7 @@ export function createDestination(id: DestinationId): CreativeDestination {
     getCapabilities: () => ({
       clipboard: true,
       externalBrowser: true,
-      embedded: false,
+      embedded: isTauri(),
     }),
     async open() {
       if (isTauri()) {

@@ -1,8 +1,28 @@
+mod auth_smoke;
+mod destinations;
+mod policy;
+
 use tauri_plugin_sql::{Migration, MigrationKind};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    let auth_smoke = std::env::args().any(|arg| arg == "--auth-smoke");
     tauri::Builder::default()
+        .manage(destinations::DestinationState::default())
+        .invoke_handler(tauri::generate_handler![
+            destinations::embed_destination,
+            destinations::update_destination_bounds,
+            destinations::hide_destination,
+            destinations::reload_destination,
+            destinations::focus_destination,
+            destinations::close_destination,
+        ])
+        .setup(move |app| {
+            if auth_smoke {
+                auth_smoke::start(app.handle())?;
+            }
+            Ok(())
+        })
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_opener::init())
         .plugin(

@@ -2,7 +2,7 @@
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "main",
   "description": "Local companion data, explicit clipboard writes, and approved creative destinations.",
-  "windows": ["main"],
+  "webviews": ["main"],
   "permissions": [
     "core:default",
     "sql:default",
