@@ -20,11 +20,16 @@ pub fn run() {
         .setup(move |app| {
             if auth_smoke {
                 auth_smoke::start(app.handle())?;
+            } else {
+                // A release's anonymous smoke must never update its freshly built bundle.
+                app.handle()
+                    .plugin(tauri_plugin_updater::Builder::new().build())?;
             }
             Ok(())
         })
         .plugin(tauri_plugin_clipboard_manager::init())
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_process::init())
         .plugin(
             tauri_plugin_sql::Builder::default()
                 .add_migrations(

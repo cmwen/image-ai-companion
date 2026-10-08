@@ -769,3 +769,20 @@ footer {
     overflow-y: auto;
   }
 }
+
+.updater {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  color: #667653;
+  font-size: 11px;
+}
+.updater progress {
+  width: 100px;
+  height: 7px;
+  accent-color: #60773f;
+}
+.updater .small {
+  font-size: 10px;
+}

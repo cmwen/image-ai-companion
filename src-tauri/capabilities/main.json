@@ -5,6 +5,8 @@
   "webviews": ["main"],
   "permissions": [
     "core:default",
+    "updater:default",
+    "process:allow-restart",
     "sql:default",
     "sql:allow-execute",
     "clipboard-manager:allow-write-text",

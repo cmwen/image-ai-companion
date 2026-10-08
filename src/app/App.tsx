@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Updater from "../features/updater/Updater";
 import { isTauri } from "@tauri-apps/api/core";
 import { nativeEmbeddedBridge } from "../features/destinations/embedded";
 import DestinationWorkspace from "../features/destinations/DestinationWorkspace";
@@ -775,6 +776,7 @@ export default function App() {
           <footer>
             <span>Visual language, one idea at a time.</span>
             <span>Local first · Starter library</span>
+            <Updater />
           </footer>
         </div>
         {native && (

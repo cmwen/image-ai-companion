@@ -24,5 +24,12 @@ codesign --display --verbose=4 "$mount_path/Image AI Companion.app" 2>&1 | grep 
 lipo "$mount_path/Image AI Companion.app/Contents/MacOS/image-ai-companion" -verify_arch arm64 x86_64
 mkdir -p release-assets
 cp "${dmgs[0]}" "release-assets/Image-AI-Companion_${RELEASE_TAG}_universal.dmg"
-tar -czf "release-assets/Image-AI-Companion_${RELEASE_TAG}_universal.app.tar.gz" -C "$bundle_dir/macos" 'Image AI Companion.app'
-(cd release-assets && shasum -a 256 ./*.dmg ./*.tar.gz > SHA256SUMS && shasum -a 256 -c SHA256SUMS)
+# Tauri signs these exact archive bytes. Re-tarring the app invalidates its signature.
+updates=("$bundle_dir"/macos/*.app.tar.gz)
+[[ ${#updates[@]} -eq 1 && -s "${updates[0]}.sig" ]]
+update_name="Image-AI-Companion_${RELEASE_TAG}_universal.app.tar.gz"
+cp "${updates[0]}" "release-assets/$update_name"
+cp "${updates[0]}.sig" "release-assets/$update_name.sig"
+cmp -s "${updates[0]}" "release-assets/$update_name"
+cmp -s "${updates[0]}.sig" "release-assets/$update_name.sig"
+(cd release-assets && shasum -a 256 ./*.dmg ./*.tar.gz ./*.sig > SHA256SUMS && shasum -a 256 -c SHA256SUMS)
